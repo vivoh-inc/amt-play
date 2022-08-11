@@ -44,10 +44,14 @@ multicast = '232.162.250.140'
 source = "162.250.138.201"
     
 def main():
-    # parse_arguments()
-    start_segmenter()
-    time.sleep(1)
-    start_amt_tunnel(relay, source, multicast)
-    start_web_server()
+    try:
+        # parse_arguments()
+        start_segmenter()
+        time.sleep(1)
+        amt_thread = start_amt_tunnel(relay, source, multicast)
+        start_web_server()
+    except KeyboardInterrupt:
+        print("interrupted by keyboard!")
+        amt_thread.event.set()
 
 main()
