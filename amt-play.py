@@ -2,6 +2,9 @@ from amt import start_amt_tunnel
 from web import start_web_server
 from segmenter import start_segmenter
 import time
+import sys
+import os
+from argparser import process_amt_url
 
 # Valid AMT URLS are:
 
@@ -15,36 +18,54 @@ import time
 
 def usage():
     explanation="""
+You must provide an environment variable named AMT_URL. 
+
+You can optionally use AMT_RELAY to provide a relay URL. 
+
+AMT_URL supports two formats:
+  a legacy URL (like that used in VLC)
+  a parameterized URL (with URL query parameters)
 
 Legacy AMT URL:
 
-sudo python3 amt-play.py legacy-AMT-URL relay-IP
-
-example: 
-sudo python3 amt-play.py amt://162.250.138.201@232.162.250.138:1234 162.250.137.254
+AMT_URL=amt://162.250.138.201@232.162.250.138:1234 \\
+    AMT_RELAY=162.250.137.254 \\
+    sudo -E python3 amt-play.py
 
 Parameterized AMT URL:
 
-sudo python3 amt-play.py parameterized-AMT-URL
+AMT_URL=amt://232.162.250.138:1234?relay=162.250.137.254&timeout=2&source=162.250.138.201 \\
+    sudo -E python3 amt-play.py 
 
-example: 
-sudo python3 amt-play.py amt://232.162.250.138:1234?relay=162.250.137.254&timeout=2&source=162.250.138.201
-(you may pass a relay IP with the parameterized AMT URL it will override the relay from the query string)
+The query parameters should be:
+
+* relay
+* timeout (ignored for now)
+* source
+
+(you may pass a relay IP with the parameterized AMT_URL and that will
+override the relay from the query string)
 
 """
     print(explanation)
 
-def parse_arguments():
-    # usage()
-    # raise "Bad arguments"
-    print("Getting the arguments")
-
 relay = "162.250.137.254"
 multicast = '232.162.250.140'
 source = "162.250.138.201"
-    
+
+
+def parse_arguments():
+    amt = os.getenv('AMT_URL')
+    if not amt:
+        usage()
+        sys.exit(1)
+    else:
+        relay_tmp = os.getenv('AMT_RELAY')
+        [ r, m, s ] = process_amt_url(amt, relay_tmp)
+        return [ r, m, s ]
+
 def main():
-    # parse_arguments()
+    relay, multicast, source = parse_arguments()
     start_segmenter()
     time.sleep(1)
     start_amt_tunnel(relay, source, multicast)
