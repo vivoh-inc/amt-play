@@ -275,10 +275,9 @@ def send_amt_multicast_membership_query(s, data, nonce, relay, source, multicast
     return update
 
 
-def loop_for_data(s):
+def loop_for_data(s, event):
     count = 0
     notified = False
-    event = threading.Event()
     while True:
         if event.is_set():
             return
@@ -297,22 +296,23 @@ def loop_for_data(s):
         # print(data)
         # s.close()
 
-def _tunnel(relay, source, multicast):
+def _tunnel(event, relay, source, multicast):
     print("Starting AMT tunnel: " + relay)
     s = setup_socket()
     data, nonce = send_amt_relay_discovery(s, relay)
     data = send_amt_relay_advertisement(s, data, nonce, relay)
     update = send_amt_multicast_membership_query(s, data, nonce, relay, source, multicast)
-    loop_for_data(s) 
+    loop_for_data(s, event) 
+    print("Finished with receiver loop, cleaning up")
     s.close()
     send(amt_mem_update(nonce, update.response_mac, relay, source, multicast, False))
-    sys.exit()       
                
 def start_amt_tunnel(relay,
                      source,
                      multicast,
+                     event,
                      timeout=1000):
-    x = threading.Thread(target=_tunnel, args=(relay, source, multicast))
+    x = threading.Thread(target=_tunnel, args=(event, relay, source, multicast))
     x.start()
     return x
         

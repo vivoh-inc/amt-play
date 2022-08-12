@@ -2,6 +2,7 @@ from amt import start_amt_tunnel
 from web import start_web_server
 from segmenter import start_segmenter
 import time
+import threading
 
 # Valid AMT URLS are:
 
@@ -48,10 +49,11 @@ def main():
         # parse_arguments()
         start_segmenter()
         time.sleep(1)
-        amt_thread = start_amt_tunnel(relay, source, multicast)
+        event = threading.Event()
+        amt_thread = start_amt_tunnel(relay, source, multicast, event)
         start_web_server()
     except KeyboardInterrupt:
         print("interrupted by keyboard!")
-        amt_thread.event.set()
+        event.set()
 
 main()
