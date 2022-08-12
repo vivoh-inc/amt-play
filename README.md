@@ -40,8 +40,16 @@ Sent 1 packets.
 ..................................................Finished printing packets
  files/seg0.ts  start:  229.433322      duration:  5.333334     stream diff:  -3.962531
  files/seg1.ts  start:  234.766656      duration:  2.533333     stream diff:  -4.02043
-
+127.0.0.1 - - [12/Aug/2022 13:50:56] "GET /index.m3u8 HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2022 13:50:57] "GET /seg32.ts HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2022 13:50:57] "GET /seg33.ts HTTP/1.1" 200 -
+127.0.0.1 - - [12/Aug/2022 13:50:57] "GET /seg34.ts HTTP/1.1" 200 -
 ```
+
+This indicates the packets are coming from the tunnel (`......Finished printing packets`), the segmenter
+has started (`files/seg0.ts  start:  229.433322      duration:  5.333334     stream diff:  -3.962531`) and
+the web server is delivering to the browser (`127.0.0.1 - - [12/Aug/2022 13:50:56] "GET /index.m3u8 HTTP/1.1" 200 -`)
+
 
 # Usage
 
