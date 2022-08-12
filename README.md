@@ -9,9 +9,13 @@ git submodule init
 git submodule update
 sudo pip3 install threefive
 sudo pip3 install scapy
-sudo python3 mt-play.py
+AMT_URL=xxx sudo python3 -E amt-play.py
 open http://localhost:8080
 ```
+
+Please determine your AMT_URL and change xxx to that.
+
+(NB: You must provide the -E switch to sudo so that it pulls the AMT_URL into the root environment.)
 
 # Usage
 
