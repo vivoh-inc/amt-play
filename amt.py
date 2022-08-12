@@ -185,7 +185,7 @@ def send_data(buf):
     except Exception as err:
         print(f"Error occurred in processing packet {err}")
 
-def amt_mem_update(nonce, response_mac, relay, source, multicast):
+def amt_mem_update(nonce, response_mac, relay, source, multicast, join_leave):
     # ip_layer = IP(dst="162.250.137.254")
     ip_layer = IP(dst=relay)
     udp_layer = UDP(sport=AMT_PORT, dport=AMT_PORT)
@@ -199,12 +199,17 @@ def amt_mem_update(nonce, response_mac, relay, source, multicast):
 
     # amt://162.250.138.201@232.162.250.140
     
-    igmp_layer2 = IGMPv3mr(records=[IGMPv3gr(maddr=multicast,
-                                             srcaddrs=[source])])
+    # {1: 'Mode Is Include', 2: 'Mode Is Exclude', 3: 'Change To Include Mode', 
+    # 4: 'Change To Exclude Mode', 5: 'Allow New Sources', 6: 'Block Old Sources'}
+    if join_leave is True:
+        igmp_layer2 = IGMPv3mr(records=[IGMPv3gr(maddr=multicast, srcaddrs=[source], rtype=1)])
+    else:
+        igmp_layer2 = IGMPv3mr(records=[IGMPv3gr(maddr=multicast, srcaddrs=[source], rtype=6)])
+   
     # igmp_layer2 = IGMPv3mr(records=[IGMPv3gr(maddr='232.162.250.140', srcaddrs=["162.250.138.201"])])    
     update = ip_layer / udp_layer / amt_layer / ip_layer2 / igmp_layer / igmp_layer2
     # verbose(update.show())
-    send(update)
+    return update
 
 def setup_socket():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
@@ -255,30 +260,40 @@ def send_amt_multicast_membership_query(s, data, nonce, relay, source, multicast
     print("Sending AMT multicast membership query")
     membership_query = AMT_Membership_Query(data)
     response_mac = membership_query.response_mac
+    mq = membership_query.getlayer(IGMPv3mq)
     # verbose(membership_query.show())
     # received the membership query, send a membership update
     # req = struct.pack("=4sl", socket.inet_aton("232.198.38.1"), socket.INADDR_ANY)
     req = struct.pack("=4sl", socket.inet_aton(multicast), socket.INADDR_ANY)
     s.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, req)
     # s.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, 1)
-    amt_mem_update(nonce, response_mac, relay, source, multicast)
+    update = amt_mem_update(nonce, response_mac, relay, source, multicast, True)
+    timer = threading.Timer(mq.qqic, send, args=update)
+    timer.daemon = True
+    timer.start()
+    send(update)
+    return update
 
 
 def loop_for_data(s):
     count = 0
     notified = False
+    event = threading.Event()
     while True:
-        # receive the multicast data!
-        data, addr = s.recvfrom(DEFAULT_MTU)        # receive the membership query
-        send_data(data)
-        if count < 50:
-            print(".", flush=True, end="")
-            count += 1
+        if event.is_set():
+            return
         else:
-            if not notified:
-                print("Finished printing packets")
-                notified = True
-                
+            # receive the multicast data!
+            data, addr = s.recvfrom(DEFAULT_MTU)        # receive the membership query
+            send_data(data)
+            if count < 50:
+                print(".", flush=True, end="")
+                count += 1
+            else:
+                if not notified:
+                    print("Finished printing packets")
+                    notified = True
+                    
         # print(data)
         # s.close()
 
@@ -287,12 +302,18 @@ def _tunnel(relay, source, multicast):
     s = setup_socket()
     data, nonce = send_amt_relay_discovery(s, relay)
     data = send_amt_relay_advertisement(s, data, nonce, relay)
-    send_amt_multicast_membership_query(s, data, nonce, relay, source, multicast)
-    loop_for_data(s)
-        
+    update = send_amt_multicast_membership_query(s, data, nonce, relay, source, multicast)
+    loop_for_data(s) 
+    s.close()
+    send(amt_mem_update(nonce, update.response_mac, relay, source, multicast, False))
+    sys.exit()       
+               
 def start_amt_tunnel(relay,
                      source,
                      multicast,
                      timeout=1000):
     x = threading.Thread(target=_tunnel, args=(relay, source, multicast))
     x.start()
+    return x
+        
+
