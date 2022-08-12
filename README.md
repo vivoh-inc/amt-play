@@ -9,13 +9,36 @@ git submodule init
 git submodule update
 sudo pip3 install threefive
 sudo pip3 install scapy
-AMT_URL=xxx sudo python3 -E amt-play.py
+AMT_URL="xxx" sudo python3 -E amt-play.py
 open http://localhost:8080
 ```
 
 Please determine your AMT_URL and change xxx to that.
 
 (NB: You must provide the -E switch to sudo so that it pulls the AMT_URL into the root environment.)
+
+You should see this:
+
+```
+$ AMT_URL="amt://232.162.250.138?relay=162.250.137.254&timeout=2&source=162.250.138.201" sudo -E python3 amt-play.py 
+Starting segmenter
+Starting AMT tunnel: 162.250.137.254
+Starting web server
+Sending AMT relay discovery
+Serving at port 8080
+.
+Sent 1 packets.
+Sending AMT relay advertisement
+.
+Sent 1 packets.
+Sending AMT multicast membership query
+.
+Sent 1 packets.
+..................................................Finished printing packets
+ files/seg0.ts  start:  229.433322      duration:  5.333334     stream diff:  -3.962531
+ files/seg1.ts  start:  234.766656      duration:  2.533333     stream diff:  -4.02043
+
+```
 
 # Usage
 
@@ -36,7 +59,7 @@ AMT_URL=amt://162.250.138.201@232.162.250.138:1234 \\
 
 Parameterized AMT URL:
 
-AMT_URL=amt://232.162.250.138:1234?relay=162.250.137.254&timeout=2&source=162.250.138.201 \\
+AMT_URL="amt://232.162.250.138?relay=162.250.137.254&timeout=2&source=162.250.138.201" \\
     sudo -E python3 amt-play.py 
 
 The query parameters should be:
