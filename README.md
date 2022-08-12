@@ -13,14 +13,17 @@ AMT_URL="xxx" sudo python3 -E amt-play.py
 open http://localhost:8080
 ```
 
-Please determine your AMT_URL and change xxx to that.
+Please determine your AMT_URL and change xxx to that. Make sure to wrap the AMT_URL value in quotes to prevent the shell
+from interpreting ampersands as shell characters.
 
-(NB: You must provide the -E switch to sudo so that it pulls the AMT_URL into the root environment.)
+NB: You must provide the -E switch to sudo so that it pulls the AMT_URL into the root environment.)
 
 You should see this:
 
 ```
-$ AMT_URL="amt://232.162.250.138?relay=162.250.137.254&timeout=2&source=162.250.138.201" sudo -E python3 amt-play.py 
+$ AMT_URL="amt://232.162.250.138?relay=162.250.137.254&timeout=2&source=162.250.138.201" \
+  sudo -E python3 amt-play.py 
+  
 Starting segmenter
 Starting AMT tunnel: 162.250.137.254
 Starting web server
