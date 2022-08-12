@@ -57,7 +57,7 @@ The `parse_arguments` code is straightforwar: we parse the arguments (the AMT_UR
 
 Each of the next set of functions starts a thread to handle functionality for the segmenter, amt tunnel and the web server.
 
-The segmenter code relies on a project called [X9K3](https://github.com/futzu/x9k3) which converts UDP video packets into HLS streams and then dumps the index.m3u8 and TS files into a directory (currently hardcoded to "files"). 
+The segmenter code relies on a fork of a project called [X9K3](https://github.com/futzu/x9k3) which converts UDP video packets into HLS streams and then dumps the index.m3u8 and TS files into a directory (currently hardcoded to "files"). 
 
 The AMT tunnel code does the AMT dance: sending a relay discovery, sending the relay advertisement, and then
 issuing the multicast join. If you use VLC (4.0+) with an AMT URL and watch traffic in Wireshark, you will see the equivalent
