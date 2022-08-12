@@ -61,11 +61,11 @@ def parse_arguments():
         sys.exit(1)
     else:
         relay_tmp = os.getenv('AMT_RELAY')
-        [ r, m, s ] = process_amt_url(amt, relay_tmp)
-        return [ r, m, s ]
+        r, m, s, t = process_amt_url(amt, relay_tmp)
+        return r, m, s, t
 
 def main():
-    relay, multicast, source = parse_arguments()
+    relay, multicast, source, _timeout = parse_arguments()
     start_segmenter()
     time.sleep(1)
     start_amt_tunnel(relay, source, multicast)
