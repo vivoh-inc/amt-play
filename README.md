@@ -67,3 +67,17 @@ to receiving the packets and sends them to 127.0.0.1:3000 (and the segmenter pic
 The web code sets up a simple web server on 127.0.0.1:8080 to serve the index.html, JS and CSS files, and the m3u8 file
 which points to TS files. The only thing special about the server code is that it disables caching so that when the
 browser requests the m3u8 file it is always delivered with the latest content.
+
+# Running Tests
+
+Please run tests when working on the code, and add tests as much as possible.
+
+```
+python3 argument_parser_test.py 
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
+
+```
