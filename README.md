@@ -19,6 +19,7 @@ Please determine your AMT_URL and change xxx to that.
 
 # Usage
 
+```
 You must provide an environment variable named AMT_URL. 
 
 You can optionally use AMT_RELAY to provide a relay URL. 
@@ -46,6 +47,7 @@ The query parameters should be:
 
 (you may pass a relay IP with the parameterized AMT_URL and that will
 override the relay from the query string)
+```
 
 # Developer Notes
 
