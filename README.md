@@ -102,6 +102,11 @@ The web code sets up a simple web server on 127.0.0.1:8080 to serve the index.ht
 which points to TS files. The only thing special about the server code is that it disables caching so that when the
 browser requests the m3u8 file it is always delivered with the latest content.
 
+# To Do
+
+- [ ] Refactor to handle ctrl-c correctly
+- [ ] Correctly shutdown tunnel when exit event occurs
+
 # Running Tests
 
 Please run tests when working on the code, and add tests as much as possible.
